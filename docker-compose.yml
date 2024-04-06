@@ -1,0 +1,15 @@
+name: taskwarrriorsyncserver
+services:
+    taskwarrior-sync-server:
+        restart: unless-stopped
+        build: .
+        container_name: taskwarriorsyncserver
+        environment:
+            - RUST_LOG=debug
+        volumes:
+            - taskwarrior-data:/var/taskwarrior-data
+        ports:
+            - "8443:8443"
+
+volumes:
+    taskwarrior-data:
