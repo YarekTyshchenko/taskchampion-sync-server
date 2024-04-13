@@ -1,4 +1,4 @@
-FROM ubuntu:22.04 AS base
+FROM ubuntu:22.04 AS build
 
 ENV DEBIAN_FRONTEND noninteractive
 
@@ -32,4 +32,9 @@ RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs > rustup.sh && \
     sh rustup.sh -y --profile minimal --default-toolchain stable --component rust-docs
 
 RUN ~/.cargo/bin/cargo build -p taskchampion-sync-server --release
-CMD ./target/release/taskchampion-sync-server --port 8443 --data-dir /var/taskwarrior-data
+
+FROM ubuntu:22.04 as run
+
+COPY --from=build /opt/taskwarrior/target/release/taskchampion-sync-server /usr/local/bin/taskchampion-sync-server
+
+CMD ["/usr/local/bin/taskchampion-sync-server", "--port", "8443", "--data-dir", "/taskwarrior-data"]
